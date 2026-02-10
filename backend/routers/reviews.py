@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List
-from .. import models, database, schemas
-from ..services import review_service
+import models, database, schemas
+from services import review_service
 
 router = APIRouter()
 
@@ -16,7 +16,6 @@ def get_stats(db: Session = Depends(database.get_db)):
     total = db.query(models.Review).count()
     avg_rating = db.query(func.avg(models.Review.rating)).scalar() or 0.0
     
-    # Rating breakdown
     breakdown = {i: 0 for i in range(1, 6)}
     counts = db.query(models.Review.rating, func.count(models.Review.id)).group_by(models.Review.rating).all()
     for rating, count in counts:
@@ -24,7 +23,6 @@ def get_stats(db: Session = Depends(database.get_db)):
         if rounded in breakdown:
             breakdown[rounded] += count
 
-    # Sentiment summary
     sentiment = {"positive": 0, "neutral": 0, "negative": 0}
     reviews = db.query(models.Review.sentiment_score).all()
     for (score,) in reviews:
@@ -43,7 +41,6 @@ def get_stats(db: Session = Depends(database.get_db)):
 @router.post("/sync")
 def trigger_sync(background_tasks: BackgroundTasks, db: Session = Depends(database.get_db)):
     platforms = db.query(models.Platform).all()
-    # We create a new session for the background task to avoid issues with the request session closing
     for platform in platforms:
         background_tasks.add_task(review_service.sync_platform_reviews, database.SessionLocal(), platform.id)
     return {"message": "Sync started in background"}

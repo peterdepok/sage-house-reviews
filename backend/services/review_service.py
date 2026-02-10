@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
-from .. import models, schemas
-from .sentiment import analyze_sentiment
-from ..scrapers.google_reviews import GoogleScraper
-from ..scrapers.caring_com import CaringComScraper
-from ..scrapers.aplaceformom import APlaceForMomScraper
+import models, schemas
+from services.sentiment import analyze_sentiment
+from scrapers.google_reviews import GoogleScraper
+from scrapers.caring_com import CaringComScraper
+from scrapers.aplaceformom import APlaceForMomScraper
 from datetime import datetime
 import logging
 
@@ -32,7 +32,6 @@ def sync_platform_reviews(db: Session, platform_id: int):
     count = 0
     
     for r_data in new_reviews:
-        # Deduplication
         exists = db.query(models.Review).filter(
             models.Review.platform_id == platform.id,
             models.Review.external_review_id == r_data.external_id
@@ -52,16 +51,13 @@ def sync_platform_reviews(db: Session, platform_id: int):
             )
             db.add(review)
             
-            # Auto-alert for low ratings
             if r_data.rating <= 3.0:
                 alert = models.Alert(
-                    review_id=None, # Will be set after flush
+                    review_id=None,
                     alert_type="negative_review",
                     status="active"
                 )
                 db.add(alert)
-                # Note: We'd normally link the alert to the review ID here, 
-                # but we need to flush/commit first or use session events.
             
             count += 1
     
