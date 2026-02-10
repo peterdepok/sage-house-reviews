@@ -1,46 +1,24 @@
-# Sage House Review Dashboard - Backend Dependencies
-
-# Web Framework
-fastapi==0.109.2
-uvicorn[standard]==0.27.1
-python-multipart==0.0.9
-
-# Database
-sqlalchemy==2.0.25
-alembic==1.13.1
-
-# Configuration
-pydantic==2.6.1
-pydantic-settings==2.1.0
-python-dotenv==1.0.1
-
-# HTTP Client
-requests==2.31.0
-tenacity==8.2.3
-
-# Web Scraping
-beautifulsoup4==4.12.3
-lxml==5.1.0
-
-# Sentiment Analysis
-nltk==3.8.1
-textblob==0.18.0
-
-# Scheduling
-apscheduler==3.10.4
-
-# Database Drivers
-# SQLite is built-in
-# Uncomment for PostgreSQL:
-# psycopg2-binary==2.9.9
-
-# Development
-pytest==8.0.0
-pytest-asyncio==0.23.4
-httpx==0.26.0  # For testing FastAPI
-black==24.1.1
-isort==5.13.2
-mypy==1.8.0
-
-# Logging
-structlog==24.1.0
+fastapi
+uvicorn[standard]
+python-multipart
+sqlalchemy
+alembic
+pydantic
+pydantic-settings
+python-dotenv
+requests
+tenacity
+beautifulsoup4
+lxml
+vaderSentiment
+nltk
+textblob
+apscheduler
+psycopg2-binary
+pytest
+pytest-asyncio
+httpx
+black
+isort
+mypy
+structlog
