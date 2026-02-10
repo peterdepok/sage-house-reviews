@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from . import models, database, config
+from . import models, database
 from .routers import reviews, platforms, alerts
+from .services import scheduler
 
 models.Base.metadata.create_all(bind=database.engine)
 
@@ -15,6 +15,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+def startup_event():
+    scheduler.start_scheduler()
 
 app.include_router(reviews.router, prefix="/api/reviews", tags=["reviews"])
 app.include_router(platforms.router, prefix="/api/platforms", tags=["platforms"])
