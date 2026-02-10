@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from . import models, database
-from .routers import reviews, platforms, alerts
-from .services import scheduler
-from .seed import seed_platforms
+import models, database
+from routers import reviews, platforms, alerts
+from services import scheduler
+from seed import seed_platforms
 
 models.Base.metadata.create_all(bind=database.engine)
 
