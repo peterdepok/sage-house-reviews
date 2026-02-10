@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import models, database
 from .routers import reviews, platforms, alerts
 from .services import scheduler
+from .seed import seed_platforms
 
 models.Base.metadata.create_all(bind=database.engine)
 
@@ -18,6 +19,12 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup_event():
+    # Ensure platforms are seeded on startup
+    try:
+        seed_platforms()
+    except Exception as e:
+        print(f"Seeding error: {e}")
+    
     scheduler.start_scheduler()
 
 app.include_router(reviews.router, prefix="/api/reviews", tags=["reviews"])
