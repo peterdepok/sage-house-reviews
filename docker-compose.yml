@@ -1,79 +1,26 @@
-# Sage House Review Dashboard - Docker Compose Configuration
-# Use for local development and testing
-
-version: "3.8"
+version: '3.8'
 
 services:
-  # Backend API
   backend:
-    build:
-      context: ./backend
+    build: 
+      context: .
       dockerfile: Dockerfile
-    container_name: sage-house-backend
     ports:
       - "8000:8000"
-    environment:
-      - ENVIRONMENT=development
-      - DEBUG=true
-      - DATABASE_URL=sqlite:///./data/sage_house_reviews.db
-      - ENABLE_SCHEDULER=true
-      - SYNC_INTERVAL_HOURS=6
-      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
-    env_file:
-      - .env
     volumes:
       - ./backend:/app
-      - backend-data:/app/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    restart: unless-stopped
+    environment:
+      - DATABASE_URL=sqlite:///./sage_house_reviews.db
+    env_file:
+      - .env
 
-  # Frontend (development)
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      target: development
-    container_name: sage-house-frontend
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://backend:8000
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - VITE_API_URL=http://localhost:8000
     depends_on:
       - backend
-    restart: unless-stopped
-
-  # PostgreSQL (optional - for production-like testing)
-  # Uncomment to use PostgreSQL instead of SQLite
-  # postgres:
-  #   image: postgres:15-alpine
-  #   container_name: sage-house-postgres
-  #   environment:
-  #     POSTGRES_USER: sage_house
-  #     POSTGRES_PASSWORD: sage_house_password
-  #     POSTGRES_DB: sage_house_reviews
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres-data:/var/lib/postgresql/data
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "pg_isready -U sage_house"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #   restart: unless-stopped
-
-volumes:
-  backend-data:
-  # postgres-data:
-
-networks:
-  default:
-    name: sage-house-network
